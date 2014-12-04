@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import itertools
+
+from calltuple import default_key_generator
+from calltuple import CallTuple
+
 
 class BaseFetchDriver(object):
 
@@ -11,41 +16,67 @@ class BaseFetchDriver(object):
         if not self._namespace:
             raise NotImplementedError
 
-    def _in():
-        NotImplementedError()
-
-    def _out():
-        NotImplementedError()
-
-
-def default_key_generator(f, *args, **kwargs):
-    import inspect
-
-    func_key = '%s.%s' % (f.im_func.__module__, f.__name__)
-    arg_keys = inspect.getargspec(f).args
-    has_self = bool(arg_keys) and arg_keys[0] in ('self', 'cls')
-    if has_self:
-        arg_keys = arg_keys[1:]
-
-    kwargs = kwargs.items()
-    for i in range(0, len(args)):
-        kwargs.append((arg_keys[i], args[i]))
-
-    if kwargs:
-        params_key = map(lambda x: ','.join(x),
-                         map(lambda x: map(unicode, x),
-                             sorted(kwargs, key=lambda x: x[0])))
-
-    return ':'.join([func_key] + params_key)
+    def fetch(self, kv):
+        raise NotImplementedError
 
 
 class RedisFetchDriver(BaseFetchDriver):
 
-    def __init__(self, gen_func=None):
-        super(RedisFetchDriver, self).__init('redis')
+    def __init__(self, client, gen_func=None):
+        super(RedisFetchDriver, self).__init__('redis')
+        self.client = client
         self.gen_func = gen_func
         if not gen_func:
             self.gen_func = default_key_generator
 
-    def _fetch():
+    def mget(self, keys):
+        '''
+        This mget accepts a list of key
+        return key and value, which can be directly update into dict
+        Override this method as you want
+        '''
+        values = self.client.mget(keys)
+        zipped = zip(keys, values)
+        result = itertools.compress(zipped, [pair[1] is not None for pair in zipped])
+        return result
+
+    def prepare(self, kv):
         pass
+
+    def execute(self, kv):
+        keys = []
+        for k, v in kv.iteritems():
+            if isinstance(v, CallTuple):
+                keys.append(k)
+        result = self.mget(keys)
+        kv.update(result)
+
+    def finish(self, kv):
+        pass
+
+
+class RPCFetchDriver(BaseFetchDriver):
+
+    def __init__(self, aggregate_rule=None, client=None):
+        super(RPCFetchDriver, self).__init__('RPC')
+        self.rule = aggregate_rule
+        self._kv = {}
+
+    def prepare(self, kv):
+        pass
+
+    def execute(self, kv):
+        for k, v in kv.iteritems():
+            if isinstance(v, CallTuple):
+                try:
+                    value = v.call()
+                    kv[k] = value
+                    self._kv[k] = value
+                except:
+                    kv[k] = None
+
+    def finish(self, kv):
+        pass
+
+    def get_self_kv(self):
+        return self._kv
