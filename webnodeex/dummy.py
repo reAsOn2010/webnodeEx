@@ -66,12 +66,23 @@ class Root(DummyNodeExRoot):
         }
 
 
+class NodePlus2(WebNodeEx):
+
+    def __init__(self, i):
+        super(NodePlus2, self).__init__()
+        self.i = i + 2
+
+    def register(self):
+        yield ObjectDict(
+            d1=self.dummy_rpc.call_by_id(self.i)
+        )
+
+
 class Node1(WebNodeEx):
 
     def __init__(self, i):
         super(Node1, self).__init__()
         self.i = i
-        self.client = DummyRPC()
 
     def register(self):
         yield ObjectDict(
@@ -79,18 +90,18 @@ class Node1(WebNodeEx):
             d2=self.dummy_rpc.call_by_id(2),
             d3=[self.dummy_rpc.call_by_id(i) for i in range(1, 6)]
         )
-        print self.d3
-        yield {}
 
     def children(self):
-        yield {}
+        yield {
+            'node1': Node2(),
+            'nodes': [NodePlus2(i=x) for x in self.d3],
+        }
 
 
 class Node2(WebNodeEx):
 
     def __init__(self):
         super(Node2, self).__init__()
-        self.client = DummyRPC()
 
     def register(self):
         yield {
@@ -106,7 +117,6 @@ class Node3(WebNodeEx):
 
     def __init__(self):
         super(Node3, self).__init__()
-        self.client = DummyRPC()
 
     def register(self):
         yield {

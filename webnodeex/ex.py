@@ -79,7 +79,9 @@ class WebNodeEx(object):
         if self._children is None:
             self._children = self.children()
         self.key2child.update(next(self._children, {}))
-        return self.key2child.values()
+        nodes = reduce(lambda x, y: x.extend(y) or x if isinstance(y, list) else x.append(y) or x,
+                       self.key2child.values(), [])
+        return nodes
 
     def __getattr__(self, name):
         client = self.center.get(name)
@@ -112,7 +114,6 @@ class WebNodeExRoot(WebNodeEx):
             current_key2value = {}
 
             for node in nodes:
-                print node
                 key2value = node.next()
                 if not key2value:
                     next_generation = node.nurture()
