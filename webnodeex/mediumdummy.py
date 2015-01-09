@@ -3,7 +3,7 @@
 
 from drivers import RedisFetchDriver, RPCFetchDriver
 from dummy import DummyRPC, DummyRedis
-from ex import MediumYieldNode, MediumYieldRoot
+from mediumyield import MediumYieldNode, MediumYieldRoot
 
 
 class DummyMediumYieldRoot(MediumYieldRoot):

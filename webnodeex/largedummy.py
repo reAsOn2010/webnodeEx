@@ -5,7 +5,7 @@ from tornado.util import ObjectDict
 
 from drivers import RedisFetchDriver, RPCFetchDriver
 from dummy import DummyRPC, DummyRedis
-from ex import LargeYieldNode, LargeYieldRoot
+from largeyield import LargeYieldNode, LargeYieldRoot
 
 
 class DummyLargeYieldRoot(LargeYieldRoot):
