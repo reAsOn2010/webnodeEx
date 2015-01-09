@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+
 from proxy import ClientCenter
 
 
@@ -13,7 +15,7 @@ class LargeYieldNode(object):
         self._iterator = None
         self._children = None
         self.current_level_key2value = {}
-        self.center = ClientCenter(self)
+        self._center = ClientCenter(self)
 
     def register(self):
         yield {}
@@ -48,8 +50,11 @@ class LargeYieldNode(object):
                        self.key2child.values(), [])
         return nodes
 
+    def center(self):
+        return self._center
+
     def __getattr__(self, name):
-        client = self.center.get(name)
+        client = self._center.get(name)
         if not client:
             return self._fetch(name)
         return client
@@ -65,10 +70,8 @@ class LargeYieldNode(object):
 
 class LargeYieldRoot(LargeYieldNode):
 
-    def __init__(self, rpc, drivers):
+    def __init__(self, drivers):
         super(LargeYieldRoot, self).__init__()
-        for key, client in rpc.iteritems():
-            ClientCenter.put(key, client)
         self.drivers = drivers
         self.all_key2value = {}
 
@@ -91,7 +94,7 @@ class LargeYieldRoot(LargeYieldNode):
             # aggregate and filter duplicate fetch
             current_key2value.update((key, self.all_key2value[key]) for key in current_key2value.viewkeys() & self.all_key2value.viewkeys())
 
-            print current_key2value
+            logging.debug(current_key2value)
 
             for driver in self.drivers:
                 driver.prepare(current_key2value)

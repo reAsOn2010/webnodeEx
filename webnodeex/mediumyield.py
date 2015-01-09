@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+
 from collections import OrderedDict
 from exception import WebNodeException
 from proxy import ClientCenter
@@ -90,6 +92,9 @@ class MediumYieldNode(object):
             pass
         return nodes
 
+    def center(self):
+        return self._center
+
     def __getattr__(self, name):
         client = self._center.get(name)
         if not client:
@@ -99,10 +104,8 @@ class MediumYieldNode(object):
 
 class MediumYieldRoot(MediumYieldNode):
 
-    def __init__(self, rpc, drivers):
+    def __init__(self, drivers):
         super(MediumYieldRoot, self).__init__()
-        for key, client in rpc.iteritems():
-            ClientCenter.put(key, client)
         self.drivers = drivers
         self.all_key2value = {}
 
@@ -126,7 +129,7 @@ class MediumYieldRoot(MediumYieldNode):
             # aggregate and filter duplicate fetch
             current_key2value.update((key, self.all_key2value[key]) for key in current_key2value.viewkeys() & self.all_key2value.viewkeys())
 
-            print current_key2value
+            logging.debug(self.all_key2value)
 
             for driver in self.drivers:
                 driver.prepare(current_key2value)

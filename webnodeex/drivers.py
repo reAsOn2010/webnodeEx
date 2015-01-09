@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import itertools
+import logging
 
 from calltuple import default_key_generator
 from calltuple import CallTuple
@@ -35,7 +36,10 @@ class RedisFetchDriver(BaseFetchDriver):
         return key and value, which can be directly update into dict
         Override this method as you want
         '''
-        values = self.client.mget(keys)
+        if not keys:
+            values = []
+        else:
+            values = self.client.mget(keys)
         zipped = zip(keys, values)
         result = itertools.compress(zipped, [pair[1] is not None for pair in zipped])
         return result
@@ -73,6 +77,7 @@ class RPCFetchDriver(BaseFetchDriver):
                     kv[k] = value
                     self._kv[k] = value
                 except:
+                    logging.warn('call func failed %s %s %s', str(v.func), str(v.args), str(v.kwargs))
                     kv[k] = None
 
     def finish(self, kv):

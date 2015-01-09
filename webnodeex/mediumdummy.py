@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from drivers import RedisFetchDriver, RPCFetchDriver
-from dummy import DummyRPC, DummyRedis
+from dummy import DummyRedis
 from mediumyield import MediumYieldNode, MediumYieldRoot
 
 
@@ -12,10 +12,7 @@ class DummyMediumYieldRoot(MediumYieldRoot):
         self.redis = DummyRedis()
         self.redis_driver = RedisFetchDriver(self.redis)
         self.rpc_driver = RPCFetchDriver()
-        self.rpc = {
-            'dummy_rpc': DummyRPC()
-        }
-        super(DummyMediumYieldRoot, self).__init__(self.rpc, [self.redis_driver, self.rpc_driver])
+        super(DummyMediumYieldRoot, self).__init__([self.redis_driver, self.rpc_driver])
 
     def finish(self):
         self.redis.mset(self.rpc_driver.get_self_kv())
@@ -57,6 +54,7 @@ class Node1(MediumYieldNode):
             self.dummy_rpc.call_by_id(2),
             [self.dummy_rpc.call_by_id(i) for i in range(1, 6)],
         ]
+        print d1, d2, self.d3
 
     def children(self):
         node1, nodes = yield [

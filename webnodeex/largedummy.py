@@ -4,7 +4,7 @@
 from tornado.util import ObjectDict
 
 from drivers import RedisFetchDriver, RPCFetchDriver
-from dummy import DummyRPC, DummyRedis
+from dummy import DummyRedis
 from largeyield import LargeYieldNode, LargeYieldRoot
 
 
@@ -14,10 +14,7 @@ class DummyLargeYieldRoot(LargeYieldRoot):
         self.redis = DummyRedis()
         self.redis_driver = RedisFetchDriver(self.redis)
         self.rpc_driver = RPCFetchDriver()
-        self.rpc = {
-            'dummy_rpc': DummyRPC()
-        }
-        super(DummyLargeYieldRoot, self).__init__(self.rpc, [self.redis_driver, self.rpc_driver])
+        super(DummyLargeYieldRoot, self).__init__([self.redis_driver, self.rpc_driver])
 
     def finish(self):
         self.redis.mset(self.rpc_driver.get_self_kv())
