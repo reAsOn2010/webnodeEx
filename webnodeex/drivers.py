@@ -44,6 +44,9 @@ class RedisFetchDriver(BaseFetchDriver):
         result = itertools.compress(zipped, [pair[1] is not None for pair in zipped])
         return result
 
+    def mset(self, kv={}):
+        return self.client.mset(kv)
+
     def prepare(self, kv):
         pass
 

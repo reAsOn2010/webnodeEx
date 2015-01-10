@@ -8,8 +8,6 @@ class DummyRPC(object):
         self._CALL_TIME_MAP = {}
 
     def call_by_id(self, i=0):
-        print self._CALL_TIME_MAP
-        print hex(id(self._CALL_TIME_MAP))
         check = self._CALL_TIME_MAP.get(i)
         assert(check is None)
         self._CALL_TIME_MAP[i] = True
