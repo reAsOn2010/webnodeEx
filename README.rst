@@ -4,13 +4,14 @@ WebNode EX
 `WebNode Ex` is a data collector, using coroutine to gather function calls and aggregate, using tree to solve dependency.
 
 Usage:
----
+""""""
 
 1. Implement Drivers. Examples(DummyRPC, DummyReids) in webnodeex/dummy.py
 2. Implement RootNode. Example(DummyMediumYieldRoot) in webnode/mediumdummy.py
-3. Implement the nodes, and declare functions in `register()`, declare children in `children()`. Examples in webnode/mediumdummy.py:
+3. Implement the nodes, declare functions in `register()`, and declare children in `children()`. Examples in webnode/mediumdummy.py:
 
 ::
+
     class Node1(MediumYieldNode):
 
        def __init__(self, i):
