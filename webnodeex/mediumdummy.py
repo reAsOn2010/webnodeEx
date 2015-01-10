@@ -14,7 +14,7 @@ class DummyMediumYieldRoot(MediumYieldRoot):
         self.rpc_driver = RPCFetchDriver()
         super(DummyMediumYieldRoot, self).__init__([self.redis_driver, self.rpc_driver])
 
-    def finish(self):
+    def end(self):
         self.redis.mset(self.rpc_driver.get_self_kv())
 
 

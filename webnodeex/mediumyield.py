@@ -109,7 +109,14 @@ class MediumYieldRoot(MediumYieldNode):
         self.drivers = drivers
         self.all_key2value = {}
 
+    def begin(self):
+        pass
+
+    def end(self):
+        pass
+
     def gao(self):
+        self.begin()
         nodes = self.nurture()
         while nodes:
             next_level_nodes = []
@@ -143,3 +150,5 @@ class MediumYieldRoot(MediumYieldNode):
             self.all_key2value.update(current_key2value)
 
             nodes = next_level_nodes
+
+        self.end()
