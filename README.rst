@@ -8,7 +8,7 @@ Usage:
 
 1. Implement Drivers. Examples(DummyRPC, DummyReids) in webnodeex/dummy.py
 2. Implement RootNode. Example(DummyMediumYieldRoot) in webnode/mediumdummy.py
-3. Implement the nodes, declare functions in `register()`, and declare children in `children()`. Examples in webnode/mediumdummy.py:
+3. Implement the nodes, declare functions in `register()`, and declare sub-nodes in `children()`. Examples in webnode/mediumdummy.py:
 
 ::
 
