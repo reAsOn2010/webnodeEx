@@ -62,9 +62,9 @@ class MediumYieldNode(object):
                     for item in self._current_keys:
                         assert(isinstance(item, (basestring, list)))
                         if isinstance(item, list):
-                            to_send.append([key2value.get(k) for k in item])
+                            to_send.append([key2value.get(k).result() for k in item])
                         else:
-                            to_send.append(key2value.get(item))
+                            to_send.append(key2value.get(item).result())
                 self._current_level_key2value.clear()
                 self._current_keys = self._call_iter.send(to_send)
         except StopIteration:
@@ -118,7 +118,10 @@ class MediumYieldRoot(MediumYieldNode):
     def gao(self):
         self.begin()
         nodes = self.nurture()
+        level = 0
         while nodes:
+            logging.debug('level: %d' % level)
+            level += 1
             next_level_nodes = []
             current_key2value = {}
 

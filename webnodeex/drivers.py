@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import itertools
-import logging
-
 from calltuple import default_key_generator
-from calltuple import CallTuple
 
 
 class BaseFetchDriver(object):
@@ -40,9 +36,7 @@ class RedisFetchDriver(BaseFetchDriver):
             values = []
         else:
             values = self.client.mget(keys)
-        zipped = zip(keys, values)
-        result = itertools.compress(zipped, [pair[1] is not None for pair in zipped])
-        return result
+        return values
 
     def mset(self, kv={}):
         return self.client.mset(kv)
@@ -53,10 +47,10 @@ class RedisFetchDriver(BaseFetchDriver):
     def execute(self, kv):
         keys = []
         for k, v in kv.iteritems():
-            if isinstance(v, CallTuple):
+            if not v.done():
                 keys.append(k)
-        result = self.mget(keys)
-        kv.update(result)
+        values = self.mget(keys)
+        map(lambda x, y: kv[x].set_result(y, not_set_none=True), keys, values)
 
     def finish(self, kv):
         pass
@@ -74,14 +68,9 @@ class RPCFetchDriver(BaseFetchDriver):
 
     def execute(self, kv):
         for k, v in kv.iteritems():
-            if isinstance(v, CallTuple):
-                try:
-                    value = v.call()
-                    kv[k] = value
-                    self._kv[k] = value
-                except:
-                    logging.warn('call func failed %s %s %s', str(v.func), str(v.args), str(v.kwargs))
-                    kv[k] = None
+            if not v.done():
+                v.call()
+                self._kv[k] = v.result()
 
     def finish(self, kv):
         pass

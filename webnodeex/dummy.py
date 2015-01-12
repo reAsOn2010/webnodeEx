@@ -44,8 +44,6 @@ class DummyRedis(object):
         result = []
         for key in keys:
             result.append(self._DATA.get(key))
-        else:
-            result.append(None)
         return result
 
     def mset(self, kv={}):
