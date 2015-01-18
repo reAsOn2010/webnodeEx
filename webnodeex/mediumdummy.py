@@ -14,7 +14,7 @@ class DummyMediumYieldRoot(MediumYieldRoot):
         self.rpc_driver = RPCFetchDriver()
         super(DummyMediumYieldRoot, self).__init__([self.redis_driver, self.rpc_driver])
 
-    def end(self):
+    def on_finish(self):
         self.redis.mset(self.rpc_driver.get_self_kv())
 
 
@@ -38,8 +38,7 @@ class NodePlus2(MediumYieldNode):
         self.i = i + 2
 
     def register(self):
-        d1 = yield self.dummy_rpc.call_by_id(self.i)
-        assert(d1 == d1)
+        self.d1 = yield self.dummy_rpc.call_by_id(self.i)
 
 
 class Node1(MediumYieldNode):
@@ -69,7 +68,7 @@ class Node2(MediumYieldNode):
         super(Node2, self).__init__()
 
     def register(self):
-        d1, d2 = yield [
+        self.d1, self.d2 = yield [
             self.dummy_rpc.call_by_id(1),
             self.dummy_rpc.call_by_id(3),
         ]
@@ -88,10 +87,7 @@ class Node3(MediumYieldNode):
             self.dummy_rpc.call_by_id(2),
             self.dummy_rpc.call_by_id(4),
         ]
-        d3 = yield [
-            self.dummy_rpc.call_by_id(d1),
-        ]
-        assert(d3 == d3)
+        self.d3 = yield self.dummy_rpc.call_by_id(d1)
 
     def children(self):
         yield []

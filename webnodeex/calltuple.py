@@ -67,9 +67,9 @@ class CallTuple(object):
             raise e
 
 
-class CallTupleCenter(object):
+class CallTupleManager(object):
 
-    def __init__(self, generate_func):
+    def __init__(self, generate_func=None):
         self._dict = {}
         if not generate_func:
             self.generate_func = default_key_generator
@@ -82,7 +82,7 @@ class CallTupleCenter(object):
         if not call:
             call = CallTuple(func, *args, **kwargs)
             self._dict[key] = call
-        return (key, call)
+        return key, call
 
     def generate_key(self, func, *args, **kwargs):
         return self.generate_func(func, *args, **kwargs)

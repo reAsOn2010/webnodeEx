@@ -56,7 +56,7 @@ class MediumYieldNode(object):
             else:
                 assert(isinstance(self._current_keys, (basestring, list)))
                 if isinstance(self._current_keys, basestring):
-                    to_send = key2value.get(self._current_keys)
+                    to_send = key2value.get(self._current_keys).result()
                 else:
                     to_send = []
                     for item in self._current_keys:
@@ -109,14 +109,20 @@ class MediumYieldRoot(MediumYieldNode):
         self.drivers = drivers
         self.all_key2value = {}
 
-    def begin(self):
+    def prepare(self):
+        self.on_prepare()
+
+    def on_prepare(self):
         pass
 
-    def end(self):
+    def finish(self):
+        self.on_finish()
+
+    def on_finish(self):
         pass
 
     def gao(self):
-        self.begin()
+        self.prepare()
         nodes = self.nurture()
         level = 0
         while nodes:
@@ -154,4 +160,4 @@ class MediumYieldRoot(MediumYieldNode):
 
             nodes = next_level_nodes
 
-        self.end()
+        self.finish()
