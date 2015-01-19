@@ -40,13 +40,6 @@ class MediumYieldNode(object):
         self._current_level_key2value[key] = call_tuple
         return key
 
-    def trans(self, key2value):
-        f = lambda x: \
-            [key2value.get(key) for key in x] \
-            if isinstance(x, list) \
-            else key2value.get(key)
-        return map(f, self._current_keys)
-
     def send(self, key2value):
         try:
             if self._call_iter is None:
